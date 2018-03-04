@@ -217,24 +217,30 @@ class univectorField:
 
         minDistance = 1000000 # some big number
         closestCenter = np.array([None, None]) # array to store the closest center
-        # get the repulsive field centers
-        for i in range(self.obstacles.shape[0]):
-            self.avdObsField.updateObstacle(self.obstacles[i], self.obstaclesSpeed[i])
-            center = self.avdObsField.getVirtualPos()
-            currentDistance = np.linalg.norm(center - self.robotPos)
-            if minDistance > currentDistance:
-                minDistance = currentDistance
-                closestCenter = center
 
-        fi_auf = self.avdObsField.fi_auf(self.robotPos, _vPos=closestCenter, _theta=True)
-        # the first case when the robot is to clode from an obstacle
+        if self.obstacles.size:
+            # get the repulsive field centers
+            for i in range(self.obstacles.shape[0]):
+                self.avdObsField.updateObstacle(self.obstacles[i], self.obstaclesSpeed[i])
+                center = self.avdObsField.getVirtualPos()
+                currentDistance = np.linalg.norm(center - self.robotPos)
+                if minDistance > currentDistance:
+                    minDistance = currentDistance
+                    closestCenter = center
+            fi_auf = self.avdObsField.fi_auf(self.robotPos, _vPos=closestCenter, _theta=True)
+
+        # the first case when the robot is to close from an obstacle
         # print minDistance, self.DMIN
         if minDistance <= self.DMIN:
             return fi_auf
         else:
             fi_tuf = self.mv2GoalField.fi_tuf(self.robotPos)
-            g = gaussian(minDistance - self.DMIN, self.LDELTA)
-            return g*fi_auf + (1.0-g)*fi_tuf
-            # return fi_tuf
+
+            # Checks if at least one obstacle exist
+            if self.obstacles.size:
+                g = gaussian(minDistance - self.DMIN, self.LDELTA)
+                return g*fi_auf + (1.0-g)*fi_tuf
+            else:
+                return fi_tuf
 
 
