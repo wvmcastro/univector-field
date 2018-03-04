@@ -39,12 +39,11 @@ if __name__:
     # Create matrix to store the fields
     field = np.zeros((h, w))
 
-    # obstacle = np.array([getObstacle(), getObstacle(), getObstacle(), getObstacle(), getObstacle()])
-    # vObstacle = np.array([[0,0], [0,0], [0,0], [0,0], [0,0]])
-    obstacle=np.array([[]])
-    vObstacle=np.array([[]])
-    # obstacle = np.array([getObstacle()])
-    # vObstacle = np.array([[0, 0]])
+    obstacle = np.array([getObstacle(), getObstacle(), getObstacle(), getObstacle(), getObstacle()])
+    vObstacle = np.array([[0,0], [0,0], [0,0], [0,0], [0,0]])
+    # obstacle=np.array([[]])
+    # vObstacle=np.array([[]])
+    
     robot = getRobot()
     ball = getBall()
 

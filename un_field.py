@@ -10,6 +10,14 @@ def angleWithX(p):
     theta = math.atan2(np.cross(p, i), np.dot(p, i))
     return theta
 
+def wrap2pi(theta):
+    if theta > pi:
+        return theta - 2*pi
+    if theta < -pi:
+        return 2*pi + theta
+    else:
+        return theta
+
 class hyperbolicSpiral:
 
     def __init__(self, _Kr, _radius):
@@ -235,7 +243,7 @@ class univectorField:
             return fi_auf
         else:
             fi_tuf = self.mv2GoalField.fi_tuf(self.robotPos)
-
+            fi_tuf = wrap2pi(fi_tuf)
             # Checks if at least one obstacle exist
             if self.obstacles.size:
                 g = gaussian(minDistance - self.DMIN, self.LDELTA)
