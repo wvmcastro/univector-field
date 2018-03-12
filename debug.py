@@ -32,7 +32,7 @@ RADIUS = 0.8
 KR = 1.04
 K0 = 0.12
 DMIN = 1.79
-LDELTA = 1.14
+LDELTA = 2.28
 
 if __name__:
 
@@ -59,7 +59,8 @@ if __name__:
     for l in range(h):
         for c in range(w):
             # field[l][c] = avdField.fi_auf([c, -l])
-            field[l][c] = univetField.getVec(_robotPos=[c, -l], _vRobot=[0,0])
+            pos = [c, -l]
+            field[l][c] = univetField.getVec(_robotPos=pos, _vRobot=[0,0])
     # X-axis of all vectors
     Ur = np.cos(field)
     # Y-axis of all vectors

@@ -37,7 +37,7 @@ class hyperbolicSpiral:
             r = radius
 
         p = np.array(_p)
-        theta = angleWithX(p)
+        theta = wrap2pi(angleWithX(p))
         ro = np.linalg.norm(p)
 
         if ro > r:
@@ -46,9 +46,9 @@ class hyperbolicSpiral:
             a = (pi / 2.0) * math.sqrt(ro / r)
 
         if cw:
-            return theta + a
+            return wrap2pi(theta + a)
         else:
-            return theta - a
+            return wrap2pi(theta - a)
 
     def n_h(self, _p, _radius=None, cw=True):
         p = np.array(_p)
@@ -79,7 +79,7 @@ class repulsive:
 
         if _theta == True:
             theta = angleWithX(p)
-            return theta
+            return wrap2pi(theta)
         else:
             return p
 
@@ -123,7 +123,7 @@ class move2Goal:
             # Apesar de no paper nao ser utilizado o modulo, quando utilizado
             # na implementacao o resultado foi mais condizente
             vec = ( abs(yl)*nhCCW + abs(yr)*nhCW ) / (2.0 * r)
-            return angleWithX(vec)
+            return wrap2pi(angleWithX(vec))
         elif y < -r:
             return hyperSpiral.fi_h(pl, cw=True)
         else: #y >= r
@@ -243,12 +243,11 @@ class univectorField:
             return fi_auf
         else:
             fi_tuf = self.mv2GoalField.fi_tuf(self.robotPos)
-            fi_tuf = wrap2pi(fi_tuf)
             # Checks if at least one obstacle exist
             if self.obstacles.size:
                 g = gaussian(minDistance - self.DMIN, self.LDELTA)
-                return g*fi_auf + (1.0-g)*fi_tuf
-            else:
+                return wrap2pi(g*fi_auf + (1.0-g)*fi_tuf)
+            else: # if there is no obstacles
                 return fi_tuf
 
 
