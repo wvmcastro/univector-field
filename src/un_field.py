@@ -7,7 +7,7 @@ from gauss import gaussian
 
 def angleWithX(p):
     i = np.array([1.0,0.0])
-    theta = math.atan2(np.cross(p, i), np.dot(p, i))
+    theta = math.atan2(np.cross(i, p), np.dot(i, p))
     return theta
 
 def wrap2pi(theta):
