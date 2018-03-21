@@ -6,11 +6,18 @@ import numpy as np
 import random
 import cv2
 import math
+import time
 
 from src.un_field import avoidObstacle
 from src.un_field import move2Goal
 from src.un_field import angleWithX
 from src.un_field import univectorField
+
+
+SIMULACAO = 0 # turn on simulation
+              # if you turn on the simulantion please make the directories: erros and erros/log
+EPOCAS = 10000 # how many simulations
+
 
 w, h = 150, 130 # the width and height sizes of the field in centimiters
 timeColor = (255, 0 , 0)
@@ -18,11 +25,11 @@ enemyColor = (0, 255, 255)
 ballColor = (31, 136, 246)
 pathColor = (255, 0, 255)
 
-RADIUS = 2.0
-KR = 1.04
+RADIUS = 3.48
+KR = 4.15
 K0 = 0.12
-DMIN = 1.79
-LDELTA = 2.28
+DMIN = 3.48
+LDELTA = 4.57
 
 def getObstacle():
     return np.array([random.randint(0, w-1), -random.randint(0, h-1)])
@@ -85,8 +92,10 @@ def drawPath(img, start, end, univetField):
     _currentPos = cm2pixel(currentPos)
 
     newPos = None
-    alpha = 0.7
-    beta = 1
+    alpha = 0.8
+    beta = 7
+
+    t0 = time.time()
 
     while(np.linalg.norm(currentPos - end) >= beta):
         theta = univetField.getVec(_robotPos=currentPos, _vRobot=[0,0])
@@ -96,38 +105,66 @@ def drawPath(img, start, end, univetField):
         
         cv2.line(img, (_currentPos[0], -_currentPos[1]), (_newPos[0], -_newPos[1]), pathColor, 3)
 
-        cv2.imshow('campo', img)
-        if cv2.waitKey(1) & 0xFF == ord('q'):
-                break
+        # cv2.imshow('campo', img)
+        # if cv2.waitKey(1) & 0xFF == ord('q'):
+        #         break
+
+        if (time.time() - t0 > 5):
+            return False, newPos
 
         currentPos = newPos
         _currentPos = _newPos
+    return True, None
 
 
 if __name__:
     imgField = cv2.imread('img/vss-field.jpg')
 
-    robot = getRobot()
-    ball = getBall()
+    rep = EPOCAS
+    i = 0
+    while rep > 0:
+        imgField2 = np.copy(imgField)
 
-    obstacle = np.array([getObstacle(), getObstacle(), getObstacle(), getObstacle(), getObstacle(), getObstacle()])
-    vObstacle = np.array([[0,0], [0,0], [0,0], [0,0], [0,0], [0,0]])
+        robot = getRobot()
+        ball = getBall()
 
-    # Drawing components
-    drawRobot(imgField, robot)
-    drawObstacles(imgField, obstacle)
-    drawBall(imgField, cm2pixel(ball))
+        obstacle = np.array([getObstacle(), getObstacle(), getObstacle(), getObstacle(), getObstacle()])
+        vObstacle = np.array([[0,0], [0,0], [0,0], [0,0], [0,0]])
 
-    # Creates the univector field
-    univetField = univectorField()
-    univetField.updateConstants(RADIUS, KR, K0, DMIN, LDELTA)
-    univetField.updateBall(ball)
-    univetField.updateObstacles(obstacle, vObstacle)
+        # obstacle = np.array([getObstacle()])
+        # vObstacle = np.array([[0,0]])
 
-    
-    drawField(imgField, univetField)
-    drawPath(imgField, robot, ball, univetField)
+        # Drawing components
+        drawRobot(imgField2, robot)
+        drawObstacles(imgField2, obstacle)
+        drawBall(imgField2, cm2pixel(ball))
 
-    # display the path in the field
-    cv2.imshow('campo', imgField)
-    cv2.waitKey(0)
+        # Creates the univector field
+        univetField = univectorField()
+        univetField.updateConstants(RADIUS, KR, K0, DMIN, LDELTA)
+        univetField.updateBall(ball)
+        univetField.updateObstacles(obstacle, vObstacle)
+
+        
+        drawField(imgField2, univetField)
+        ret, pos = drawPath(imgField2, robot, ball, univetField)
+
+        # display the path in the field
+        if not SIMULACAO:
+            cv2.imshow('campo', imgField2)
+            cv2.waitKey(0)
+            break
+        else:
+            if not ret:
+                cv2.imwrite('./erros/Erro-'+ str(i)+'.jpg', imgField2)
+                nomeArquivo = './erros/log/Erro-'+str(i)+'.txt'
+                arquivo = open(nomeArquivo, 'w+')
+                texto = "Obstaculos: " + str(obstacle) + '\n'
+                texto += "Bola: " + str(ball) + '\n'
+                texto += "Robo: " + str(pos) + '\n'
+                arquivo.writelines(texto)
+                arquivo.close()
+
+                print "Simulacao", i
+                rep -= 1
+                i += 1

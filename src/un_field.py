@@ -111,17 +111,17 @@ class move2Goal:
         yl = y+r
         yr = y-r
 
-        # Parece que houve algum erro de digitacao no paper
+        # Parece que houve algum erro de digitacao no artigo
         # Pois quando pl e pr sao definidos dessa maneira o campo gerado
-        # se parece mais com o resultado obtido no paper
+        # se parece mais com o resultado obtido no artigo
         pl = np.array([x, yl])
         pr = np.array([x, yr])
 
         if -r <= y < r:
             nhCCW = n_h(pl, cw=False)
             nhCW = n_h(pr, cw=True)
-            # Apesar de no paper nao ser utilizado o modulo, quando utilizado
-            # na implementacao o resultado foi mais condizente
+            # Apesar de no artigo nao ser utilizado o modulo, quando utilizado
+            # na implementacao o resultado foi mais condizente com o artigo
             vec = ( abs(yl)*nhCCW + abs(yr)*nhCW ) / (2.0 * r)
             return wrap2pi(angleWithX(vec))
         elif y < -r:
@@ -222,23 +222,26 @@ class univectorField:
         if all(ball != None):
             self.updateBall(ball)
 
-
-        minDistance = 1000000 # some big number
         closestCenter = np.array([None, None]) # array to store the closest center
+        centers = []
+        minDistance = self.DMIN + 1
 
         if self.obstacles.size:
             # get the repulsive field centers
             for i in range(self.obstacles.shape[0]):
                 self.avdObsField.updateObstacle(self.obstacles[i], self.obstaclesSpeed[i])
                 center = self.avdObsField.getVirtualPos()
-                currentDistance = np.linalg.norm(center - self.robotPos)
-                if minDistance > currentDistance:
-                    minDistance = currentDistance
-                    closestCenter = center
+                centers.append(center)
+
+            centers = np.asarray(centers)
+            distVect = np.linalg.norm(np.subtract(centers, self.robotPos) , axis=1)
+            index = np.argmin(distVect) # index of closest center
+            closestCenter = centers[index]
+            minDistance = distVect[index]
+
             fi_auf = self.avdObsField.fi_auf(self.robotPos, _vPos=closestCenter, _theta=True)
 
         # the first case when the robot is to close from an obstacle
-        # print minDistance, self.DMIN
         if minDistance <= self.DMIN:
             return fi_auf
         else:
@@ -246,8 +249,6 @@ class univectorField:
             # Checks if at least one obstacle exist
             if self.obstacles.size:
                 g = gaussian(minDistance - self.DMIN, self.LDELTA)
-                return wrap2pi(g*fi_auf + (1.0-g)*fi_tuf)
+                return g*fi_auf + (1.0-g)*fi_tuf
             else: # if there is no obstacles
                 return fi_tuf
-
-
