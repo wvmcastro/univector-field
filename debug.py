@@ -16,7 +16,7 @@ from src.un_field import univectorField
 
 SIMULACAO = 0 # turn on simulation
               # if you turn on the simulantion please make the directories: erros and erros/log
-EPOCAS = 10000 # how many simulations
+EPOCAS = 1 # how many simulations (min value is one)
 
 
 w, h = 150, 130 # the width and height sizes of the field in centimiters
@@ -29,7 +29,7 @@ RADIUS = 3.48
 KR = 4.15
 K0 = 0.12
 DMIN = 3.48
-LDELTA = 4.57
+LDELTA = 4.5
 
 def getObstacle():
     return np.array([random.randint(0, w-1), -random.randint(0, h-1)])
@@ -105,9 +105,9 @@ def drawPath(img, start, end, univetField):
         
         cv2.line(img, (_currentPos[0], -_currentPos[1]), (_newPos[0], -_newPos[1]), pathColor, 3)
 
-        # cv2.imshow('campo', img)
-        # if cv2.waitKey(1) & 0xFF == ord('q'):
-        #         break
+        cv2.imshow('campo', img)
+        if cv2.waitKey(1) & 0xFF == ord('q'):
+                break
 
         if (time.time() - t0 > 5):
             return False, newPos
@@ -117,7 +117,7 @@ def drawPath(img, start, end, univetField):
     return True, None
 
 
-if __name__:
+if __name__ == "__main__":
     imgField = cv2.imread('img/vss-field.jpg')
 
     rep = EPOCAS
@@ -164,7 +164,7 @@ if __name__:
                 texto += "Robo: " + str(pos) + '\n'
                 arquivo.writelines(texto)
                 arquivo.close()
-
-                print "Simulacao", i
-                rep -= 1
-                i += 1
+            
+            rep -= 1
+            print "Simulacao", i
+            i += 1

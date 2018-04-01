@@ -18,6 +18,8 @@ def wrap2pi(theta):
     else:
         return theta
 
+
+
 class hyperbolicSpiral:
 
     def __init__(self, _Kr, _radius):
@@ -249,6 +251,7 @@ class univectorField:
             # Checks if at least one obstacle exist
             if self.obstacles.size:
                 g = gaussian(minDistance - self.DMIN, self.LDELTA)
-                return g*fi_auf + (1.0-g)*fi_tuf
+                diff = wrap2pi(fi_auf - fi_tuf)
+                return g*diff + fi_tuf
             else: # if there is no obstacles
                 return fi_tuf
