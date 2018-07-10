@@ -13,6 +13,8 @@ from src.un_field import move2Goal
 from src.un_field import angleWithX
 from src.un_field import univectorField
 
+ESQ = 0
+DIR = 1
 
 SIMULACAO = 0 # turn on simulation
               # if you turn on the simulantion please make the directories: erros and erros/log
@@ -75,16 +77,10 @@ def drawField(img, univetField):
 
             v = np.array([np.cos(theta), np.sin(theta)])
 
-            # print "origin, pos, vet"
-            # print univetField.mv2GoalField.origin, pos, v
-
-            # print [pos[0], -pos[1]], v
             s = cm2pixel(np.array([c, l]))
             new = cm2pixel(np.array(pos)) + 10*v
-            # print pos, v, pos + 12*v, "1"
-            new[1] = -new[1]
 
-            # print s, v, new, "2"
+            new[1] = -new[1]
             cv2.arrowedLine(img, tuple(np.int0(s)), tuple(np.int0(new)), (50,50,50), 1)
 
 def drawPath(img, start, end, univetField):
@@ -102,7 +98,7 @@ def drawPath(img, start, end, univetField):
         v = np.array([math.cos(theta), math.sin(theta)])
         newPos = currentPos + (alpha*v)
         _newPos = cm2pixel(newPos).astype(int)
-        
+
         cv2.line(img, (_currentPos[0], -_currentPos[1]), (_newPos[0], -_newPos[1]), pathColor, 3)
 
         cv2.imshow('campo', img)
@@ -140,12 +136,12 @@ if __name__ == "__main__":
         drawBall(imgField2, cm2pixel(ball))
 
         # Creates the univector field
-        univetField = univectorField()
+        univetField = univectorField(atack_goal=DIR)
         univetField.updateConstants(RADIUS, KR, K0, DMIN, LDELTA)
         univetField.updateBall(ball)
         univetField.updateObstacles(obstacle, vObstacle)
 
-        
+
         drawField(imgField2, univetField)
         ret, pos = drawPath(imgField2, robot, ball, univetField)
 
@@ -164,7 +160,7 @@ if __name__ == "__main__":
                 texto += "Robo: " + str(pos) + '\n'
                 arquivo.writelines(texto)
                 arquivo.close()
-            
+
             rep -= 1
             print "Simulacao", i
             i += 1
