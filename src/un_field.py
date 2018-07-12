@@ -5,8 +5,8 @@ import math
 from math import pi
 from gauss import gaussian
 
-ESQ = 0
-DIR = 1
+LEFT = 0
+RIGHT = 1
 
 def angleWithX(p):
     i = np.array([1.0,0.0])
@@ -20,8 +20,6 @@ def wrap2pi(theta):
         return 2*pi + theta
     else:
         return theta
-
-
 
 class hyperbolicSpiral:
 
@@ -91,7 +89,7 @@ class repulsive:
 
 class move2Goal:
 
-    def __init__(self, _Kr, _radius, atack_goal=ESQ):
+    def __init__(self, _Kr, _radius, atack_goal=LEFT):
         self.Kr = _Kr
         self.radius = _radius
         self.hyperSpiral = hyperbolicSpiral(self.Kr, self.radius)
@@ -126,7 +124,7 @@ class move2Goal:
         # Este caso eh para quando o robo esta dentro do "circulo" da bola
         if -r <= y < r:
 
-            if self.atack_goal == ESQ:
+            if self.atack_goal == LEFT:
                 nh_pl = n_h(pl, cw=False)
                 nh_pr = n_h(pr, cw=True)
             else:
@@ -138,12 +136,12 @@ class move2Goal:
             vec = ( abs(yl)*nh_pl + abs(yr)*nh_pr ) / (2.0 * r)
             return wrap2pi(angleWithX(vec))
         elif y < -r:
-            if self.atack_goal == ESQ:
+            if self.atack_goal == LEFT:
                 return hyperSpiral.fi_h(pl, cw=True)
             else:
                 return hyperSpiral.fi_h(pr, cw=False)
         else: #y >= r
-            if self.atack_goal == ESQ:
+            if self.atack_goal == LEFT:
                 return hyperSpiral.fi_h(pr, cw=False)
             else:
                 return hyperSpiral.fi_h(pl, cw=True)
@@ -190,7 +188,7 @@ class avoidObstacle:
         self.vRobot = np.array(_vRobot)
 
 class univectorField:
-    def __init__(self, atack_goal=ESQ):
+    def __init__(self, atack_goal=LEFT):
         self.obstacles = np.array([[None, None]])
         self.obstaclesSpeed = np.array([[None, None]])
         self.ballPos = np.array([None, None])

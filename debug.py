@@ -8,21 +8,18 @@ import cv2
 import math
 import time
 
-from src.un_field import avoidObstacle
-from src.un_field import move2Goal
-from src.un_field import angleWithX
 from src.un_field import univectorField
 
-ESQ = 0
-DIR = 1
+LEFT = 0
+RIGHT = 1
 
-SIMULACAO = 0 # turn on simulation
-              # if you turn on the simulantion please make the directories: erros and erros/log
-EPOCAS = 1 # how many simulations (min value is one)
+SIMULATION = 0 # turn on simulation
+              # if you turn on the simulantion please make the RIGHTectories: erros and erros/log
+EPOCH = 1 # how many simulations (min value is one)
 
 
 w, h = 150, 130 # the width and height sizes of the field in centimiters
-timeColor = (255, 0 , 0)
+teamColor = (255, 0 , 0)
 enemyColor = (0, 255, 255)
 ballColor = (31, 136, 246)
 pathColor = (255, 0, 255)
@@ -54,7 +51,7 @@ def drawRobot(img, robotPos, enemy=False):
     if enemy:
         color = enemyColor
     else:
-        color = timeColor
+        color = teamColor
 
     pos = cm2pixel([robotPos[0], -robotPos[1]])
     topLeft = (pos[0]-15, pos[1]-15)
@@ -101,7 +98,7 @@ def drawPath(img, start, end, univetField):
 
         cv2.line(img, (_currentPos[0], -_currentPos[1]), (_newPos[0], -_newPos[1]), pathColor, 3)
 
-        cv2.imshow('campo', img)
+        cv2.imshow('field', img)
         if cv2.waitKey(1) & 0xFF == ord('q'):
                 break
 
@@ -116,7 +113,7 @@ def drawPath(img, start, end, univetField):
 if __name__ == "__main__":
     imgField = cv2.imread('img/vss-field.jpg')
 
-    rep = EPOCAS
+    rep = EPOCH
     i = 0
     while rep > 0:
         imgField2 = np.copy(imgField)
@@ -136,7 +133,7 @@ if __name__ == "__main__":
         drawBall(imgField2, cm2pixel(ball))
 
         # Creates the univector field
-        univetField = univectorField(atack_goal=DIR)
+        univetField = univectorField(atack_goal=RIGHT)
         univetField.updateConstants(RADIUS, KR, K0, DMIN, LDELTA)
         univetField.updateBall(ball)
         univetField.updateObstacles(obstacle, vObstacle)
@@ -146,8 +143,8 @@ if __name__ == "__main__":
         ret, pos = drawPath(imgField2, robot, ball, univetField)
 
         # display the path in the field
-        if not SIMULACAO:
-            cv2.imshow('campo', imgField2)
+        if not SIMULATION:
+            cv2.imshow('field', imgField2)
             cv2.waitKey(0)
             break
         else:
@@ -155,12 +152,12 @@ if __name__ == "__main__":
                 cv2.imwrite('./erros/Erro-'+ str(i)+'.jpg', imgField2)
                 nomeArquivo = './erros/log/Erro-'+str(i)+'.txt'
                 arquivo = open(nomeArquivo, 'w+')
-                texto = "Obstaculos: " + str(obstacle) + '\n'
-                texto += "Bola: " + str(ball) + '\n'
-                texto += "Robo: " + str(pos) + '\n'
+                texto = "Obstacles: " + str(obstacle) + '\n'
+                texto += "Ball: " + str(ball) + '\n'
+                texto += "Robot: " + str(pos) + '\n'
                 arquivo.writelines(texto)
                 arquivo.close()
 
             rep -= 1
-            print "Simulacao", i
+            print "SIMULATION", i
             i += 1
