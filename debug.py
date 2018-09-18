@@ -10,6 +10,7 @@ import time
 
 from src.un_field import univectorField
 
+
 LEFT = 0
 RIGHT = 1
 
@@ -24,10 +25,12 @@ enemyColor = (0, 255, 255)
 ballColor = (31, 136, 246)
 pathColor = (255, 0, 255)
 
+globalBallPos = None
+
 RADIUS = 3.48
-KR = 4.15
+KR = 4.35
 K0 = 0.12
-DMIN = 3.48
+DMIN = 5.0
 LDELTA = 4.5
 
 def getObstacle():
@@ -78,7 +81,7 @@ def drawField(img, univetField):
             new = cm2pixel(np.array(pos)) + 10*v
 
             new[1] = -new[1]
-            cv2.arrowedLine(img, tuple(np.int0(s)), tuple(np.int0(new)), (50,50,50), 1)
+            cv2.arrowedLine(img, tuple(np.int0(s)), tuple(np.int0(new)), (0,255,255), 1)
 
 def drawPath(img, start, end, univetField):
     currentPos = start
@@ -119,10 +122,15 @@ if __name__ == "__main__":
         imgField2 = np.copy(imgField)
 
         robot = getRobot()
-        ball = getBall()
+        globalBallPos = ball = getBall()
 
-        obstacle = np.array([getObstacle(), getObstacle(), getObstacle(), getObstacle(), getObstacle()])
-        vObstacle = np.array([[0,0], [0,0], [0,0], [0,0], [0,0]])
+        obstaclesList = [getObstacle(), getObstacle(), getObstacle()]
+        print "Posicao dos obstaculos: ", obstaclesList
+        obstacle = np.array(obstaclesList)
+        vObstacle = np.array([[0,0], [0,0], [0,0]])
+
+        # obstacle    = np.array([])
+        # vObstacle   = np.array([])
 
         # obstacle = np.array([getObstacle()])
         # vObstacle = np.array([[0,0]])
@@ -133,14 +141,17 @@ if __name__ == "__main__":
         drawBall(imgField2, cm2pixel(ball))
 
         # Creates the univector field
-        univetField = univectorField(atack_goal=RIGHT)
+        univetField = univectorField(attack_goal=np.array([0, -65]), _rotation=True)
         univetField.updateConstants(RADIUS, KR, K0, DMIN, LDELTA)
+
         univetField.updateBall(ball)
+
         univetField.updateObstacles(obstacle, vObstacle)
 
 
         drawField(imgField2, univetField)
         ret, pos = drawPath(imgField2, robot, ball, univetField)
+        print "Draw path done!"
 
         # display the path in the field
         if not SIMULATION:
