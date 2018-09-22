@@ -49,9 +49,11 @@ class hyperbolicSpiral:
             a = (pi / 2.0) * math.sqrt(ro / r)
 
         if cw:
-            return atan2(sin(theta+a), cos(theta+a))
+            _theta = wrap2pi(theta+a)
+            return atan2(sin(_theta), cos(_theta))
         else:
-            return atan2(sin(theta-a), cos(theta-a))
+            _theta = wrap2pi(theta-a)
+            return atan2(sin(_theta), cos(_theta))
 
     def n_h(self, _p, _radius=None, cw=True):
         p = np.array(_p)
@@ -114,11 +116,11 @@ class move2Goal:
             self.u = np.array(self.attack_goal - self.origin, dtype=np.float32)
         else: # is int
             if self.attack_goal == RIGHT:
-                self.u = np.array([1.0, 0.0])
-            else:
                 self.u = np.array([-1.0, 0.0])
+            else:
+                self.u = np.array([1.0, 0.0])
 
-        self.u /= np.linalg.norm(self.u)
+        self.u /= -np.linalg.norm(self.u)
         theta = math.atan2(self.u[1], self.u[0])
         self.v = np.array([-sin(theta), cos(theta)])
 
@@ -141,22 +143,23 @@ class move2Goal:
         # Parece que houve algum erro de digitacao no artigo
         # Pois quando pl e pr sao definidos dessa maneira o campo gerado
         # se parece mais com o resultado obtido no artigo
-        pl = np.array([x, yl])
-        pr = np.array([x, yr])
+        pl = np.array([x, yr])
+        pr = np.array([x, yl])
 
         # Este caso eh para quando o robo esta dentro do "circulo" da bola
         if -r <= y < r:
-            nh_pl = n_h(pl, cw=True)
-            nh_pr = n_h(pr, cw=False)
+            nh_pl = n_h(pl, cw=False)
+            nh_pr = n_h(pr, cw=True)
+
             # Apesar de no artigo nao ser utilizado o modulo, quando utilizado
             # na implementacao o resultado foi mais condizente com o artigo
             vec = ( abs(yl)*nh_pl + abs(yr)*nh_pr ) / (2.0 * r)
             vec = np.dot(self.toCanonicalMatrix, vec).reshape(2,)
         else:
             if y < -r:
-                theta =  hyperSpiral.fi_h(pr, cw=False)
-            else: #y >= r
                 theta =  hyperSpiral.fi_h(pl, cw=True)
+            else: #y >= r
+                theta =  hyperSpiral.fi_h(pr, cw=False)
 
             vec = np.array([cos(theta), sin(theta)])
             vec = np.dot(self.toCanonicalMatrix, vec).reshape(2,)
@@ -298,6 +301,6 @@ class univectorField:
                 # result = np.array([v1[0]*v2[0]-v1[1]*v2[1], v1[0]*v2[1]+v2[0]*v1[1]])
                 # return atan2(result[1], result[0])
                 diff = wrap2pi(fi_auf - fi_tuf)
-                return g*diff + fi_tuf
+                return wrap2pi(g*diff + fi_tuf)
             else: # if there is no obstacles
                 return fi_tuf

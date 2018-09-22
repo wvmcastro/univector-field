@@ -27,8 +27,8 @@ pathColor = (255, 0, 255)
 
 globalBallPos = None
 
-RADIUS = 3.48
-KR = 4.35
+RADIUS = 4.0
+KR = 4.9
 K0 = 0.12
 DMIN = 5.0
 LDELTA = 4.5
@@ -78,7 +78,7 @@ def drawField(img, univetField):
             v = np.array([np.cos(theta), np.sin(theta)])
 
             s = cm2pixel(np.array([c, l]))
-            new = cm2pixel(np.array(pos)) + 10*v
+            new = cm2pixel(np.array(pos)) + 9*v
 
             new[1] = -new[1]
             cv2.arrowedLine(img, tuple(np.int0(s)), tuple(np.int0(new)), (0,255,255), 1)
@@ -89,7 +89,7 @@ def drawPath(img, start, end, univetField):
 
     newPos = None
     alpha = 0.8
-    beta = 7
+    beta = 1
 
     t0 = time.time()
 
@@ -126,11 +126,11 @@ if __name__ == "__main__":
 
         obstaclesList = [getObstacle(), getObstacle(), getObstacle()]
         print "Posicao dos obstaculos: ", obstaclesList
-        obstacle = np.array(obstaclesList)
-        vObstacle = np.array([[0,0], [0,0], [0,0]])
+        # obstacle = np.array(obstaclesList)
+        # vObstacle = np.array([[0,0], [0,0], [0,0]])
 
-        # obstacle    = np.array([])
-        # vObstacle   = np.array([])
+        obstacle    = np.array([])
+        vObstacle   = np.array([])
 
         # obstacle = np.array([getObstacle()])
         # vObstacle = np.array([[0,0]])
@@ -141,7 +141,7 @@ if __name__ == "__main__":
         drawBall(imgField2, cm2pixel(ball))
 
         # Creates the univector field
-        univetField = univectorField(attack_goal=np.array([0, -65]), _rotation=True)
+        univetField = univectorField(attack_goal=np.array([150, -65]), _rotation=True)
         univetField.updateConstants(RADIUS, KR, K0, DMIN, LDELTA)
 
         univetField.updateBall(ball)
