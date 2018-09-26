@@ -116,9 +116,9 @@ class move2Goal:
             self.u = np.array(self.attack_goal - self.origin, dtype=np.float32)
         else: # is int
             if self.attack_goal == RIGHT:
-                self.u = np.array([-1.0, 0.0])
-            else:
                 self.u = np.array([1.0, 0.0])
+            else:
+                self.u = np.array([-1.0, 0.0])
 
         self.u /= -np.linalg.norm(self.u)
         theta = math.atan2(self.u[1], self.u[0])

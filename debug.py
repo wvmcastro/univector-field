@@ -70,15 +70,15 @@ def drawBall(img, ballPos):
     cv2.circle(img, (ballPos[0], -ballPos[1]), 9, ballColor, -1)
 
 def drawField(img, univetField):
-    for l in range(0, h, 3):
-        for c in range(0, w, 3):
+    for l in range(0, h, 2):
+        for c in range(0, w, 2):
             pos = [c, -l]
             theta = univetField.getVec(_robotPos=pos, _vRobot=[0,0])
 
             v = np.array([np.cos(theta), np.sin(theta)])
 
             s = cm2pixel(np.array([c, l]))
-            new = cm2pixel(np.array(pos)) + 9*v
+            new = cm2pixel(np.array(pos)) + 8*v
 
             new[1] = -new[1]
             cv2.arrowedLine(img, tuple(np.int0(s)), tuple(np.int0(new)), (0,255,255), 1)
